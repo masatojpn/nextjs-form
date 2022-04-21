@@ -5,15 +5,27 @@ import { useForm } from 'react-hook-form';
 // model
 // -------------------------------------
 type FormInputs = {
-	firstName: string,
-	lastName: string,
-	gender: string,
-	age: number,
-	work: string
+	projectTitle: string,
+	taskTitle: string,
+	category: string,
+	tags: string[],
+	workTime: string
 }
 
-const genderMap = new Map<string, string>([['1', '男性',], ['2', '女性'], ['3', '他']]);
-const workMap = new Map<string, string>([['1', '死神代行'], ['2', '滅却師'], ['3', '学生']]);
+// -------------------------------------
+// 初期値を設定
+// -------------------------------------
+const defaultValues: FormInputs = {
+	projectTitle: '1',
+	taskTitle: '作業内容',
+	category: '1',
+	tags: ['1'],
+	workTime: '1'
+}
+
+const projectMap = new Map<string, string>([['1', 'プロジェクトA'], ['2', 'プロジェクトB'], ['3', 'プロジェクトC']]);
+const categoryMap = new Map<string, string>([['1', 'フロントエンド'], ['2', 'バックエンド'], ['3', 'インフラ'], ['4', 'デザイン']]);
+const tagMap = new Map<string, string>([['1', 'TypeScript'], ['2', 'jQuery'], ['3', 'JavaScript'], ['4', 'PHP'], ['5', 'Laravel']]);
 
 export const Form = () => {
 
@@ -23,67 +35,95 @@ export const Form = () => {
 
 	// register / handleSubmitをuseFormで初期化
 	// genericsで型を指定する
+	// 初期値をセットする場合useForm関数内でdefaultValuesオブジェクトに変数を指定する
 	const {
-		register, handleSubmit
-	} = useForm<FormInputs>()
+		register, handleSubmit, formState:{ errors }
+	} = useForm<FormInputs>({
+		defaultValues: defaultValues
+	})
 
 	// フォーム送信時の型チェック
 	// 引数に名前と型を指定
 	const onSubmit = (data: FormInputs) => {
 		setData(data)
+		console.log(data);
 	};
 
 	return(
 		<>
-			<h1>React Hook Form</h1>
 			<form onSubmit={handleSubmit(onSubmit)}>
 				<label>
-					苗字
+					プロジェクト
 					{/*
 						フォーム要素にスプレッドでregister関数を展開
 						第一引数には input などのname属性（先にtype hogehoge = {} で定義）
 					 */}
-					<input type="text" {...register('lastName', { required: true })} />
-				</label>
-				<label>
-					名前
-					<input type="text" {...register('firstName', { required: true })} />
-				</label>
-				<label>
-					性別
-					<input type="radio" {...register('gender', { required: true })} value={1}/>男性
-					<input type="radio" {...register('gender', { required: true })} value={2}/>女性
-					<input type="radio" {...register('gender', { required: true })} value={3}/>Skip
-				</label>
-
-				<label>
-					年齢
-					<input type="number" {...register('age', { required: true })}/>
-				</label>
-
-				<label>
-					性別
-					<select {...register('work', {required: true})}>
-						<option value="">選択してください</option>
-						<option value="1">死神代行</option>
-						<option value="2">滅却師</option>
-						<option value="3">学生</option>
+					<select {...register('projectTitle', {
+						required: {
+							value: true,
+							message: 'プロジェクトを選択してください',
+						}
+					})}>
+						<option value="1">プロジェクトA</option>
+						<option value="2">プロジェクトB</option>
+						<option value="3">プロジェクトC</option>
+						<option value="4">プロジェクトD</option>
 					</select>
+					{errors.projectTitle && <span className="error">{errors.projectTitle.message}</span>}
+				</label>
+
+				<label>
+					作業内容
+					<textarea {...register('taskTitle', {
+						required: {
+							value: true,
+							message: '作業内容を入力してください',
+						}
+					})} />
+					{errors.taskTitle && <span className="error">{errors.taskTitle.message}</span>}
+				</label>
+
+				<label>
+					性別
+					<input type="radio" {...register('category', { required: true })} value={1}/>フロントエンド
+					<input type="radio" {...register('category', { required: true })} value={2}/>バックエンド
+					<input type="radio" {...register('category', { required: true })} value={3}/>インフラ
+					<input type="radio" {...register('category', { required: true })} value={4}/>デザイン
+				</label>
+
+				<label>
+					<input type="checkbox" {...register('tags', { required: true })} value={1}/>TypeScript
+				</label>
+				<label>
+					<input type="checkbox" {...register('tags', { required: true })} value={2}/>jQuery
+				</label>
+				<label>
+					<input type="checkbox" {...register('tags', { required: true })} value={3}/>JavaScript
+				</label>
+				<label>
+					<input type="checkbox" {...register('tags', { required: true })} value={4}/>PHP
+				</label>
+				<label>
+					<input type="checkbox" {...register('tags', { required: true })} value={5}/>Laravel
 				</label>
 
 				<input type="submit" />
 			</form>
 			<h2>Send Data</h2>
-			Caracter data is
 			{submitData
-				? `
-					${submitData.lastName + submitData.firstName}
-					(${genderMap.get(submitData.gender)})
-					[${submitData.age}歳]
-					${workMap.get(submitData.work)}
-				`
+				? <>
+						<p>{projectMap.get(submitData.projectTitle)}</p>
+						<p>{submitData.taskTitle}</p>
+						<p>{categoryMap.get(submitData.category)}</p>
+						{submitData.tags.map((tag, k) => {
+							return(
+								<p>{tagMap.get(tag)}</p>
+							)})
+						}
+					</>
 				: 'Not send yet'
 			}
+			<h3>Errors</h3>
 		</>
 
 	)
