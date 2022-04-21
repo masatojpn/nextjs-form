@@ -90,7 +90,7 @@ export const Form = () => {
     <>
       <form className="p-8" onSubmit={handleSubmit<IPosts>(onSubmit)}>
         <input
-          className="block w-40 mb-4 rounded-md bg-slate-100 border-none mb-10 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+          className="block w-40 mb-4 rounded-md bg-slate-100 border-none shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
           type="date"
           {...register(`posts.postDate`, {
           required: {
